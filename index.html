@@ -3,23 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solaris 3D Explorer</title>
+    <title>Solaris 3D Explorer - High Visibility (Fixed)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000; color: white; }
+        body { margin: 0; overflow: hidden; background-color: #020205; color: white; }
         #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 0; }
         
-        /* Custom Scrollbar for the list */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 2px; }
         
-        /* Glassmorphism Utilities */
+        /* UI Glass Effect */
         .glass {
-            background: rgba(20, 20, 25, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.008);
+            background: rgba(10, 10, 15, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .planet-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
         }
     </style>
     <script type="importmap">
@@ -31,45 +37,46 @@
         }
     </script>
 </head>
-<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
+<body class="font-sans antialiased selection:bg-indigo-500 selection:text-white">
 
     <div id="canvas-container"></div>
 
     <div class="absolute inset-0 pointer-events-none flex flex-col md:flex-row z-10">
         
         <div class="absolute top-0 left-0 p-6 pointer-events-auto">
-            <h1 class="text-4xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">SOLARIS</h1>
-            <p class="text-sm text-gray-400 mt-1">Interactive 3D System Explorer</p>
+            <h1 class="text-5xl font-bold tracking-tighter text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">SOLARIS</h1>
+            <p class="text-sm text-blue-300 font-mono tracking-widest mt-1 opacity-90">SYSTEM EXPLORER</p>
         </div>
 
-        <div class="absolute bottom-0 left-0 w-full md:w-auto md:top-24 md:bottom-auto md:left-6 p-4 pointer-events-auto">
-            <div class="glass rounded-xl p-4 md:w-64 max-h-[30vh] md:max-h-[70vh] overflow-y-auto flex flex-row md:flex-col gap-2 overflow-x-auto">
-                <div id="planet-list" class="flex md:flex-col gap-2">
-                </div>
+        <div class="absolute bottom-0 left-0 w-full md:w-auto md:top-28 md:bottom-auto md:left-6 p-4 pointer-events-auto">
+            <div class="glass rounded-xl p-3 md:w-72 max-h-[30vh] md:max-h-[65vh] overflow-y-auto flex flex-row md:flex-col gap-1 overflow-x-auto shadow-2xl">
+                <div id="planet-list" class="flex md:flex-col gap-1">
+                    </div>
             </div>
         </div>
 
-        <div class="absolute bottom-6 right-6 md:top-24 md:bottom-auto w-[90%] md:w-80 pointer-events-auto transition-all duration-500 transform translate-y-0 opacity-100" id="info-panel">
-            <div class="glass rounded-xl p-6">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 id="info-name" class="text-2xl font-bold text-white">The Sun</h2>
-                    <span id="info-type" class="text-xs font-mono px-2 py-1 rounded">STAR</span> 
-                </div>
-                <p id="info-desc" class="text-gray-300 text-sm leading-relaxed">The star around which the earth and other astronomical objects orbit. It provides the light and energy that sustains life on Earth.</p>
-                
-                <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
-                    <div class="bg-white/5 p-2 rounded">
-                        <span class="block text-gray-500">Distance from Sun</span>
-                        <span id="info-dist" class="block text-white font-mono">0 AU</span>
-                    </div>
-                    <div class="bg-white/5 p-2 rounded">
-                        <span class="block text-gray-500">Year Length</span>
-                        <span id="info-year" class="block text-white font-mono">--</span>
-                    </div>
+        <div class="absolute bottom-6 right-6 md:top-28 md:bottom-auto w-[90%] md:w-80 pointer-events-auto transition-all duration-500 transform translate-y-0 opacity-100" id="info-panel">
+            <div class="glass rounded-xl p-6 shadow-2xl border-t border-white/10">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 id="info-name" class="text-3xl font-bold text-white tracking-tight drop-shadow-md">The Sun</h2>
+                    <span id="info-type" class="text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-yellow-500/20 text-yellow-200 border border-yellow-500/30">STAR</span> 
                 </div>
                 
-                <button id="reset-cam" class="mt-4 w-full bg-white/10 hover:bg-white/20 text-white py-2 rounded transition text-sm font-semibold border border-white/10">
-                    Reset View
+                <p id="info-desc" class="text-gray-200 text-sm leading-relaxed mb-4 font-light">The star around which the earth and other astronomical objects orbit.</p>
+                
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="bg-black/40 p-2 rounded border border-white/10">
+                        <span class="block text-gray-400 mb-1 uppercase tracking-wider text-[10px]">Distance</span>
+                        <span id="info-dist" class="block text-white font-mono text-sm">0 AU</span>
+                    </div>
+                    <div class="bg-black/40 p-2 rounded border border-white/10">
+                        <span class="block text-gray-400 mb-1 uppercase tracking-wider text-[10px]">Orbital Period</span>
+                        <span id="info-year" class="block text-white font-mono text-sm">--</span>
+                    </div>
+                </div>
+                
+                <button id="reset-cam" class="mt-5 w-full bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-100 py-2 rounded border border-indigo-500/30 transition-colors text-xs uppercase tracking-widest font-semibold">
+                    Reset Overview
                 </button>
             </div>
         </div>
@@ -79,21 +86,18 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // --- Configuration ---
         const CONFIG = {
-            rotationSpeed: 0.2, // Global orbit speed multiplier
-            orbitScale: 15,     // Spacing between planets (not strictly used, but good for context)
-            zoomFactor: 4,      // Multiplier to determine zoom distance relative to planet size
-            smoothness: 0.05    // Camera smoothing factor (Lower is slower)
+            rotationSpeed: 0.15, 
+            zoomFactor: 3.0,     
+            smoothness: 0.04    
         };
 
-        // --- Planet Data (Colors converted to standard hex strings for easy parsing) ---
-        const PLANETS = [
+        const SYSTEM_DATA = [
             {
                 name: "Sun",
-                size: 12,
+                size: 15,
                 color: "#ffaa00", 
-                emissive: "#ff4400",
+                emissive: "#ff5500",
                 distance: 0,
                 speed: 0,
                 desc: "The heart of our solar system. A nearly perfect sphere of hot plasma, radiating energy.",
@@ -103,8 +107,8 @@
             {
                 name: "Mercury",
                 size: 1.2,
-                color: "#A5A5A5",
-                distance: 20,
+                color: "#CCCCCC", 
+                distance: 24,
                 speed: 0.04,
                 desc: "The smallest planet in the Solar System and the closest to the Sun.",
                 type: "TERRESTRIAL",
@@ -113,42 +117,62 @@
             {
                 name: "Venus",
                 size: 2.4,
-                color: "#E3BB76",
-                distance: 30,
+                color: "#F5D08B",
+                distance: 38,
                 speed: 0.015,
-                desc: "The second planet from the Sun. It has a thick atmosphere that traps heat.",
+                desc: "The second planet from the Sun. It has a toxic, thick atmosphere that traps heat.",
                 type: "TERRESTRIAL",
                 year: "225 Days",
-                hasGlow: true, 
-                glowColor: "#ffd000" 
+                hasGlow: true, glowColor: "#FFD700"
             },
             {
                 name: "Earth",
                 size: 2.5,
-                color: "#2233FF",
-                distance: 45,
+                color: "#4466FF",
+                distance: 55,
                 speed: 0.01,
                 desc: "Our home. The only known planet in the universe to support life.",
                 type: "TERRESTRIAL",
                 year: "365 Days",
-                hasGlow: true, 
-                glowColor: "#00ffff" 
+                hasGlow: true, glowColor: "#00FFFF"
             },
             {
                 name: "Mars",
                 size: 1.8,
-                color: "#FF4500",
-                distance: 60,
+                color: "#FF5522",
+                distance: 74,
                 speed: 0.008,
-                desc: "The Red Planet. Dusty, cold, desert world with a very thin atmosphere.",
+                desc: "The Red Planet. A dusty, cold, desert world with a very thin atmosphere.",
                 type: "TERRESTRIAL",
                 year: "687 Days"
             },
             {
-                name: "Jupiter",
-                size: 7,
-                color: "#D9A066",
+                name: "Asteroid Belt",
+                type: "BELT",
+                distance: 90, 
+                innerRadius: 82,
+                outerRadius: 98,
+                speed: 0.005,
+                count: 3000,
+                color: "#AAAAAA", 
+                desc: "A torus-shaped region occupied by a great many solid, irregularly shaped bodies.",
+                year: "3-6 Years"
+            },
+            {
+                name: "Ceres",
+                size: 0.8, 
+                color: "#DDDDDD",
                 distance: 90,
+                speed: 0.005,
+                desc: "The largest object in the asteroid belt and the only dwarf planet in the inner solar system.",
+                type: "DWARF PLANET",
+                year: "4.6 Years"
+            },
+            {
+                name: "Jupiter",
+                size: 8,
+                color: "#E0B080",
+                distance: 125,
                 speed: 0.002,
                 desc: "The largest planet in the Solar System. A gas giant with a Great Red Spot.",
                 type: "GAS GIANT",
@@ -156,338 +180,433 @@
             },
             {
                 name: "Saturn",
-                size: 6,
-                color: "#EAD6B8",
-                distance: 125,
+                size: 7,
+                color: "#F0E0C0",
+                distance: 165,
                 speed: 0.0009,
                 hasRing: true,
-                desc: "Adorned with a dazzling system of icy rings, Saturn is unique among the planets.",
+                desc: "Adorned with a dazzling system of complex icy rings, Saturn is unique among the planets.",
                 type: "GAS GIANT",
                 year: "29 Years"
             },
             {
                 name: "Uranus",
-                size: 4,
-                color: "#D1F3F6",
-                distance: 160,
+                size: 4.5,
+                color: "#A0F0F5",
+                distance: 205,
                 speed: 0.0004,
+                hasRing: true,
+                isVerticalRing: true,
                 desc: "An ice giant. It rotates at a nearly 90-degree angle from the plane of its orbit.",
                 type: "ICE GIANT",
                 year: "84 Years"
             },
             {
                 name: "Neptune",
-                size: 3.9,
-                color: "#3E54E8",
-                distance: 190,
+                size: 4.4,
+                color: "#5577FF",
+                distance: 240,
                 speed: 0.0001,
                 desc: "The most distant major planet. Dark, cold, and whipped by supersonic winds.",
                 type: "ICE GIANT",
                 year: "165 Years"
+            },
+            {
+                name: "Pluto",
+                size: 0.7,
+                color: "#EEDDBB",
+                distance: 270,
+                speed: 0.00008,
+                desc: "Once considered the ninth planet, Pluto is the largest and most famous dwarf planet.",
+                type: "DWARF PLANET",
+                year: "248 Years"
+            },
+            {
+                name: "Haumea",
+                size: 0.6,
+                color: "#DDDDDD",
+                distance: 280,
+                speed: 0.00007,
+                desc: "A dwarf planet known for its extremely fast rotation and ellipsoid shape.",
+                type: "DWARF PLANET",
+                year: "285 Years"
+            },
+            {
+                name: "Makemake",
+                size: 0.6,
+                color: "#FFAA88",
+                distance: 290,
+                speed: 0.00006,
+                desc: "A dwarf planet in the Kuiper belt. It is one of the largest objects in the outer solar system.",
+                type: "DWARF PLANET",
+                year: "309 Years"
+            },
+            {
+                name: "Kuiper Belt",
+                type: "BELT",
+                distance: 300,
+                innerRadius: 260,
+                outerRadius: 340,
+                speed: 0.0002,
+                count: 5000,
+                color: "#88AAFF", 
+                desc: "A circumstellar disc in the outer Solar System, full of icy bodies.",
+                year: "Hundreds of Years"
+            },
+            {
+                name: "Eris",
+                size: 0.7,
+                color: "#FFFFFF",
+                distance: 350,
+                speed: 0.00005,
+                desc: "One of the most massive known dwarf planets. Its discovery led to the reclassification of Pluto.",
+                type: "DWARF PLANET",
+                year: "558 Years"
             }
         ];
 
         // --- Scene Setup ---
         const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0003);
         
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 80, 150);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+        camera.position.set(0, 140, 240);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxDistance = 400;
+        controls.maxDistance = 1500;
 
-        // Vector to store the camera's target position for smooth transition
         const targetCameraPosition = new THREE.Vector3();
         targetCameraPosition.copy(camera.position); 
 
-
-        // --- Lights ---
-        const ambientLight = new THREE.AmbientLight(0x404040, 1.5); 
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x404040, 2.0); 
         scene.add(ambientLight);
 
-        // Sun light at the origin
-        const sunLight = new THREE.PointLight(0xffffff, 6, 400); 
+        const sunLight = new THREE.PointLight(0xffffff, 4.0, 2000); 
         sunLight.position.set(0, 0, 0);
         scene.add(sunLight);
 
-        // --- Starfield ---
+        // --- Stars ---
         function createStars() {
             const geometry = new THREE.BufferGeometry();
             const vertices = [];
-            for (let i = 0; i < 3000; i++) {
-                vertices.push(
-                    THREE.MathUtils.randFloatSpread(800),
-                    THREE.MathUtils.randFloatSpread(800),
-                    THREE.MathUtils.randFloatSpread(800)
-                );
+            const colors = [];
+            const colorObj = new THREE.Color();
+            for (let i = 0; i < 6000; i++) {
+                vertices.push(THREE.MathUtils.randFloatSpread(3000), THREE.MathUtils.randFloatSpread(3000), THREE.MathUtils.randFloatSpread(3000));
+                const starType = Math.random();
+                if (starType > 0.9) colorObj.setHex(0xffffff); 
+                else if (starType > 0.7) colorObj.setHex(0xaaaaff); 
+                else colorObj.setHex(0xffaa88); 
+                colors.push(colorObj.r, colorObj.g, colorObj.b);
             }
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7, transparent: true, opacity: 0.8 });
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            const material = new THREE.PointsMaterial({ size: 1.2, vertexColors: true, transparent: true, opacity: 0.9, sizeAttenuation: true });
             const stars = new THREE.Points(geometry, material);
             scene.add(stars);
         }
         createStars();
 
 
-        // --- Helper Function for Glow Effect ---
-        function createPlanetGlow(mesh, colorHex) {
-            const loader = new THREE.TextureLoader();
-            // Note: Using a local texture path is safer than a threejs.org example path
-            // For this live demo, the existing link is kept.
-            const glowTexture = loader.load('https://threejs.org/examples/textures/sprites/glow.png'); 
-
-            const glowMaterial = new THREE.SpriteMaterial({
-                map: glowTexture,
-                color: new THREE.Color(colorHex), // Use THREE.Color
-                transparent: true,
-                blending: THREE.AdditiveBlending, 
-                opacity: 0.6
-            });
-            const glowSprite = new THREE.Sprite(glowMaterial);
+        // --- Helper: Create Belts (High Visibility) ---
+        function createBeltMesh(data) {
+            const geometry = new THREE.DodecahedronGeometry(data.name === 'Kuiper Belt' ? 0.6 : 0.3, 0);
             
-            const glowScale = mesh.geometry.parameters.radius * 4; 
-            glowSprite.scale.set(glowScale, glowScale, 1.0);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color(data.color), 
+                emissive: new THREE.Color(data.color),
+                emissiveIntensity: 0.4, 
+                roughness: 0.5,
+                metalness: 0.4
+            });
 
-            mesh.add(glowSprite);
+            const mesh = new THREE.InstancedMesh(geometry, material, data.count);
+            const dummy = new THREE.Object3D();
+
+            for (let i = 0; i < data.count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = data.innerRadius + Math.random() * (data.outerRadius - data.innerRadius);
+                const ySpread = data.name === 'Kuiper Belt' ? 12 : 3;
+                const y = THREE.MathUtils.randFloatSpread(ySpread);
+                
+                dummy.position.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
+                dummy.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+                const scale = Math.random() * 0.6 + 0.4;
+                dummy.scale.set(scale, scale, scale);
+                dummy.updateMatrix();
+                mesh.setMatrixAt(i, dummy.matrix);
+            }
+            return mesh;
         }
 
+        // --- Helper: Visible Glow (FIXED Rendering Glitch) ---
+        function createGlow(mesh, colorHex, scale) {
+            const loader = new THREE.TextureLoader();
+            const texture = loader.load('https://threejs.org/examples/textures/sprites/glow.png');
+            const material = new THREE.SpriteMaterial({ 
+                map: texture, 
+                color: new THREE.Color(colorHex), 
+                transparent: true, 
+                blending: THREE.AdditiveBlending, 
+                opacity: 0.6, 
+                depthWrite: false, // <-- FIX: Prevents black squares by disabling depth writing
+                depthTest: true     // <-- FIX: Prevents black squares by testing depth correctly
+            });
+            const sprite = new THREE.Sprite(material);
+            const s = mesh.geometry.parameters.radius * scale;
+            sprite.scale.set(s, s, 1);
+            mesh.add(sprite);
+        }
 
-        // --- Objects Management ---
-        const planetMeshes = [];
-        let focusedPlanet = null; 
+        const objects = [];
+        let focusedObject = null;
 
-        // --- Planet Creation ---
-        PLANETS.forEach((data) => {
+        SYSTEM_DATA.forEach((data) => {
             const group = new THREE.Group();
-            const planetColor = new THREE.Color(data.color); // Convert hex string to THREE.Color
-
-            // Orbit Ring (Visual aid)
-            if (data.distance > 0) {
-                const ringGeometry = new THREE.RingGeometry(data.distance - 0.2, data.distance + 0.2, 128);
-                const ringMaterial = new THREE.MeshBasicMaterial({ 
-                    color: 0xffffff, 
-                    side: THREE.DoubleSide, 
-                    transparent: true, 
-                    opacity: 0.1 
-                });
-                const orbitRing = new THREE.Mesh(ringGeometry, ringMaterial);
-                orbitRing.rotation.x = Math.PI / 2;
-                scene.add(orbitRing);
-            }
-
-            // Planet Mesh
-            const geometry = new THREE.SphereGeometry(data.size, 32, 32);
-
-            if (data.name === "Sun") {
-                const emissiveColor = new THREE.Color(data.emissive); // Convert hex string to THREE.Color
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: planetColor, 
-                    emissive: emissiveColor, 
-                    emissiveIntensity: 1.2 
-                });
-                const mesh = new THREE.Mesh(geometry, material);
-                mesh.userData = data; 
-                group.add(mesh);
-                scene.add(group);
-                planetMeshes.push({ mesh: mesh, group: group, data: data, angle: 0 });
+            
+            if (data.type === "BELT") {
+                const beltMesh = createBeltMesh(data);
+                beltMesh.userData = data;
+                scene.add(beltMesh);
+                objects.push({ type: 'belt', mesh: beltMesh, data: data });
 
             } else {
-                const material = new THREE.MeshStandardMaterial({ color: planetColor }); 
-                const mesh = new THREE.Mesh(geometry, material);
                 
-                mesh.userData = data;
+                if (data.distance > 0) {
+                    const orbitGeo = new THREE.RingGeometry(data.distance - 0.2, data.distance + 0.2, 128);
+                    const orbitMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.08 });
+                    const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+                    orbit.rotation.x = Math.PI / 2;
+                    scene.add(orbit);
+                }
 
-                // Saturn's Rings
-                if (data.hasRing) {
-                    const ringGeo = new THREE.RingGeometry(data.size * 1.4, data.size * 2.2, 64);
-                    // CHANGED: Use MeshBasicMaterial for the rings as they are not lit 
-                    // and StandardMaterial is often too dark for thin planes.
-                    const ringMat = new THREE.MeshBasicMaterial({ 
-                        color: new THREE.Color(0xaa8866), 
-                        side: THREE.DoubleSide, 
-                        transparent: true, 
-                        opacity: 0.6 
+                const geometry = new THREE.SphereGeometry(data.size, 64, 64);
+                let mesh;
+
+                if (data.name === "Sun") {
+                    const material = new THREE.MeshBasicMaterial({ color: new THREE.Color(data.color) });
+                    mesh = new THREE.Mesh(geometry, material);
+                    createGlow(mesh, "#ff6600", 6);
+                } else {
+                    
+                    const material = new THREE.MeshStandardMaterial({ 
+                        color: new THREE.Color(data.color),
+                        emissive: new THREE.Color(data.color),
+                        emissiveIntensity: 0.25, 
+                        roughness: 0.6,
+                        metalness: 0.2
                     });
-                    const saturnRing = new THREE.Mesh(ringGeo, ringMat);
-                    saturnRing.rotation.x = Math.PI / 2; 
-                    saturnRing.rotation.y = 0.2; 
-                    mesh.add(saturnRing);
+                    mesh = new THREE.Mesh(geometry, material);
+                    
+                    const glowCol = data.hasGlow ? data.glowColor : data.color;
+                    createGlow(mesh, glowCol, 3.5);
+                    
+                    if (data.hasRing) {
+                        const inner = data.size * 1.4;
+                        const outer = data.size * 2.4;
+                        
+                        if (data.name === "Saturn") {
+                            const ringGeo = new THREE.RingGeometry(inner, outer, 64);
+                            const ringMat = new THREE.MeshStandardMaterial({ 
+                                color: 0xddccaa, 
+                                emissive: 0x443322,
+                                side: THREE.DoubleSide, 
+                                transparent: true, 
+                                opacity: 0.8,
+                                depthWrite: false, // <-- FIX: Prevents ring black squares
+                            });
+                            const ring = new THREE.Mesh(ringGeo, ringMat);
+                            ring.rotation.x = Math.PI / 2;
+                            ring.rotation.y = 0.3; 
+                            mesh.add(ring);
+                        } 
+                        else if (data.name === "Uranus") {
+                            const pRingGeo = new THREE.BufferGeometry();
+                            const pVerts = [];
+                            for(let i=0; i<800; i++) {
+                                const ang = Math.random() * Math.PI * 2;
+                                const r = inner + Math.random()*(outer-inner);
+                                pVerts.push(Math.cos(ang)*r, 0, Math.sin(ang)*r);
+                            }
+                            pRingGeo.setAttribute('position', new THREE.Float32BufferAttribute(pVerts, 3));
+                            const pMat = new THREE.PointsMaterial({
+                                color: 0xffffff, 
+                                size: 0.4, 
+                                transparent:true, 
+                                opacity:0.6,
+                                depthWrite: false, // <-- FIX: Prevents ring black squares
+                            });
+                            const pMesh = new THREE.Points(pRingGeo, pMat);
+                            pMesh.rotation.z = Math.PI / 2; 
+                            pMesh.rotation.y = Math.PI / 6;
+                            mesh.add(pMesh);
+                        }
+                    }
                 }
 
-                if (data.hasGlow) {
-                    createPlanetGlow(mesh, data.glowColor);
-                }
-
+                mesh.userData = data;
                 mesh.position.x = data.distance;
                 group.add(mesh);
                 scene.add(group);
-                
-                planetMeshes.push({
-                    mesh: mesh,
-                    group: group,
-                    data: data,
+
+                objects.push({ 
+                    type: 'planet', 
+                    mesh: mesh, 
+                    group: group, 
+                    data: data, 
                     angle: Math.random() * Math.PI * 2 
                 });
             }
         });
 
-
-        // --- UI Logic ---
+        // --- UI Logic (Unchanged) ---
         const planetList = document.getElementById('planet-list');
-        const infoName = document.getElementById('info-name');
-        const infoDesc = document.getElementById('info-desc');
-        const infoType = document.getElementById('info-type');
-        const infoDist = document.getElementById('info-dist');
-        const infoYear = document.getElementById('info-year');
+        const infoElements = {
+            name: document.getElementById('info-name'),
+            type: document.getElementById('info-type'),
+            desc: document.getElementById('info-desc'),
+            dist: document.getElementById('info-dist'),
+            year: document.getElementById('info-year')
+        };
         const resetBtn = document.getElementById('reset-cam');
 
-        // Helper map for setting UI tag color
-        const typeColors = {
-            "STAR": "bg-yellow-500/20 text-yellow-300",
-            "TERRESTRIAL": "bg-green-500/20 text-green-300",
-            "GAS GIANT": "bg-red-500/20 text-red-300",
-            "ICE GIANT": "bg-blue-500/20 text-blue-300"
+        const typeStyles = {
+            "STAR": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+            "TERRESTRIAL": "bg-green-500/20 text-green-300 border-green-500/30",
+            "GAS GIANT": "bg-orange-500/20 text-orange-300 border-orange-500/30",
+            "ICE GIANT": "bg-blue-500/20 text-blue-300 border-blue-500/30",
+            "DWARF PLANET": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+            "BELT": "bg-gray-500/30 text-gray-300 border-gray-500/30"
         };
 
-
-        function updateInfo(data) {
-            infoName.innerText = data.name;
-            infoDesc.innerText = data.desc;
-            infoType.innerText = data.type;
-            infoDist.innerText = data.distance + " AU (Scaled)";
-            infoYear.innerText = data.year;
+        function updatePanel(data) {
+            infoElements.name.innerText = data.name;
+            infoElements.type.innerText = data.type;
+            infoElements.desc.innerText = data.desc;
+            infoElements.dist.innerText = data.distance + " AU";
+            infoElements.year.innerText = data.year;
             
-            // UI Improvement: Update the tag color based on planet type
-            const typeClass = typeColors[data.type] || "bg-gray-500/20 text-gray-300";
-            infoType.className = `text-xs font-mono px-2 py-1 rounded ${typeClass}`;
+            const style = typeStyles[data.type] || typeStyles["TERRESTRIAL"];
+            infoElements.type.className = `text-[10px] font-bold tracking-wider px-2 py-1 rounded border ${style}`;
 
             document.querySelectorAll('.planet-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'border-blue-400', 'ring-2', 'ring-blue-400');
+                btn.classList.remove('bg-indigo-600', 'border-indigo-400', 'shadow-lg');
                 btn.classList.add('bg-white/5', 'border-transparent');
             });
-            const activeBtn = document.getElementById(`btn-${data.name}`);
-            if(activeBtn) {
-                activeBtn.classList.remove('bg-white/5', 'border-transparent');
-                // Added a ring class for better visual focus
-                activeBtn.classList.add('bg-blue-600', 'border-blue-400', 'ring-2', 'ring-blue-400');
+            const active = document.getElementById(`btn-${data.name.replace(/\s+/g, '')}`);
+            if(active) {
+                active.classList.remove('bg-white/5', 'border-transparent');
+                active.classList.add('bg-indigo-600', 'border-indigo-400', 'shadow-lg');
             }
         }
-        
-        // Sets the `focusedPlanet` and the `targetCameraPosition`
-        function focusOnPlanet(planetObj) {
-            focusedPlanet = planetObj;
-            updateInfo(planetObj.data);
 
-            const pPos = planetObj.mesh.position;
-            const offsetDistance = 10 + (planetObj.data.size * CONFIG.zoomFactor);
-            
-            // Calculate a new camera position offset from the planet's current position (pPos)
-            // This is the desired END position for the camera.
-            targetCameraPosition.set(
-                pPos.x + offsetDistance,
-                pPos.y + offsetDistance * 0.3, // Slightly elevated view
-                pPos.z + offsetDistance
-            );
+        function focusOn(objEntry) {
+            focusedObject = objEntry;
+            updatePanel(objEntry.data);
 
-            // Set controls target immediately to the planet's position
-            controls.target.set(pPos.x, pPos.y, pPos.z);
-            controls.update(); 
+            if (objEntry.data.type === 'BELT') {
+                const dist = objEntry.data.outerRadius;
+                targetCameraPosition.set(0, dist * 1.3, dist * 0.9);
+                controls.target.set(0, 0, 0); 
+            } else {
+                const pPos = objEntry.mesh.position;
+                const offset = 12 + (objEntry.data.size * CONFIG.zoomFactor);
+                targetCameraPosition.set(pPos.x + offset, pPos.y + offset*0.6, pPos.z + offset);
+                controls.target.set(pPos.x, pPos.y, pPos.z);
+            }
+            controls.update();
         }
 
-        PLANETS.forEach(p => {
+        SYSTEM_DATA.forEach(p => {
             const btn = document.createElement('button');
-            btn.id = `btn-${p.name}`;
-            btn.className = 'planet-btn flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent transition-all w-full text-left';
+            btn.id = `btn-${p.name.replace(/\s+/g, '')}`;
+            btn.className = 'planet-btn flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-transparent transition-all w-full text-left group mb-1';
+            
+            let iconColor = p.color;
+            let shapeClass = "rounded-full";
+            if(p.type === 'BELT') { 
+                shapeClass = "rounded-sm border-2 border-dashed"; 
+                iconColor = "transparent";
+            }
+            
             btn.innerHTML = `
-                <div class="w-3 h-3 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" style="background-color: ${p.color}"></div> 
-                <span class="text-sm font-medium text-gray-200">${p.name}</span>
+                <div class="w-3 h-3 ${shapeClass} shrink-0 shadow-[0_0_10px_rgba(255,255,255,0.4)] transition-transform group-hover:scale-110" 
+                     style="background-color: ${iconColor}; border-color: ${p.color}"></div> 
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-gray-100 uppercase tracking-wide group-hover:text-white">${p.name}</span>
+                    <span class="text-[9px] text-gray-500 group-hover:text-gray-400">${p.type}</span>
+                </div>
             `;
+            
             btn.onclick = () => {
-                const target = planetMeshes.find(pm => pm.data.name === p.name);
-                focusOnPlanet(target);
+                const target = objects.find(o => o.data.name === p.name);
+                if(target) focusOn(target);
             };
             planetList.appendChild(btn);
         });
 
-        // Reset button now also resets the target camera position
         resetBtn.onclick = () => {
-            focusedPlanet = null;
-            
-            // Reset controls target
+            focusedObject = null;
+            targetCameraPosition.set(0, 140, 240);
             controls.target.set(0,0,0);
-            
-            // Set camera target position to initial view
-            targetCameraPosition.set(0, 80, 150);
-            
-            updateInfo(PLANETS[0]); 
+            updatePanel(SYSTEM_DATA[0]);
         };
-
-        // --- Animation Loop ---
-        const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Smoothly move the actual camera towards the targetCameraPosition
             camera.position.lerp(targetCameraPosition, CONFIG.smoothness);
-            
-            // Rotate Planets
-            planetMeshes.forEach(obj => {
-                // Orbit Logic
-                if (obj.data.distance > 0) {
-                    obj.angle += obj.data.speed * CONFIG.rotationSpeed;
-                    obj.mesh.position.x = Math.cos(obj.angle) * obj.data.distance;
-                    obj.mesh.position.z = Math.sin(obj.angle) * obj.data.distance;
+
+            objects.forEach(obj => {
+                if (obj.type === 'belt') {
+                    obj.mesh.rotation.y += obj.data.speed * 0.5;
+                } else {
+                    if (obj.data.distance > 0) {
+                        obj.angle += obj.data.speed * CONFIG.rotationSpeed;
+                        obj.mesh.position.x = Math.cos(obj.angle) * obj.data.distance;
+                        obj.mesh.position.z = Math.sin(obj.angle) * obj.data.distance;
+                    }
+                    if (obj.data.name === "Uranus") {
+                        obj.mesh.rotation.x += 0.01; 
+                    } else {
+                        obj.mesh.rotation.y += 0.005;
+                    }
                 }
-                
-                // Self Rotation
-                obj.mesh.rotation.y += 0.005;
             });
 
-            // Camera Tracking Logic
-            // The controls.update() is necessary for damping and camera manipulation
             controls.update();
-            
-            if (focusedPlanet) {
-                const pPos = focusedPlanet.mesh.position;
-                
-                // 1. Continuously update the controls target to follow the orbiting planet
+
+            if (focusedObject && focusedObject.type === 'planet') {
+                const pPos = focusedObject.mesh.position;
                 const targetVec = new THREE.Vector3(pPos.x, pPos.y, pPos.z);
-                controls.target.lerp(targetVec, 0.05); 
+                controls.target.lerp(targetVec, 0.05);
                 
-                // 2. IMPORTANT: When focused, we also need to continuously move the camera position
-                // to maintain the offset relative to the *moving* planet and the *user-rotated* camera view.
-                
-                // Calculate the vector from the control's target (the planet) to the current camera position
-                const offsetVector = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-                
-                // Define the desired distance based on planet size (used for setting targetCameraPosition)
-                const desiredDistance = 10 + (focusedPlanet.data.size * CONFIG.zoomFactor);
-                
-                // Set the new camera target position to be the planet position plus the scaled offset vector
-                // This ensures the camera position smoothly follows the planet while respecting user rotation
-                targetCameraPosition.copy(controls.target).addScaledVector(offsetVector, desiredDistance);
+                const offsetVec = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+                const dist = 12 + (focusedObject.data.size * CONFIG.zoomFactor);
+                targetCameraPosition.copy(controls.target).addScaledVector(offsetVec, dist);
             }
 
             renderer.render(scene, camera);
         }
 
-        // --- Resize Handler ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Initialize view: Focus on the Sun and start animation
-        focusOnPlanet(planetMeshes[0]);
+        updatePanel(SYSTEM_DATA[0]);
         animate();
 
     </script>
